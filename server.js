@@ -11,9 +11,10 @@ import db from './db.js';
 
 
 const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const IMAGE_API_URL_PRIMARY = 'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3-medium';
-const IMAGE_API_URL_FALLBACK = 'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2'
+const OPENAI_API_KEY = "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"
+const IMAGE_API_URLS = ['https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3-medium',
+    'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2',
+     'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0'];
 const RESPONSE_API_URL = 'https://api.openai.com/v1/chat/completions';
 
 
@@ -24,14 +25,20 @@ app.use(cors());
 app.use(bodyParser.json());
 
 async function generateImage(imageInput, url) {
-    const response = await axios.post(url, { inputs: imageInput }, {
-        headers: {
-            'Authorization': `Bearer ${HUGGINGFACE_API_KEY}`,
-            'Content-Type': 'application/json'
-        },
-        responseType: 'stream'
-    });
-    return response;
+    try {
+        const response = await axios.post(url, { inputs: imageInput }, {
+            headers: {
+                'Authorization': `Bearer ${HUGGINGFACE_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            responseType: 'stream'
+        });
+        console.log(response.status)
+        return response;
+    } catch(error) {
+        console.log(error)
+        throw error;
+    }
 }
 
 
@@ -40,25 +47,23 @@ app.get('/api/get-image', async (req, res) => {
         const { sessionId } = req.query;
         const imagePrompt = createImagePrompt(sessionId);
         const imageInput = imagePrompt && imagePrompt.replace(/\n/g, ' ');
-
-        try {
-            const response = await generateImage(imageInput, IMAGE_API_URL_PRIMARY);
+        let response = undefined;
+        for (let i = 0; i < IMAGE_API_URLS.length; i++) {
+            let url = IMAGE_API_URLS[i]
+            try {
+                response = await generateImage(imageInput, url);
+                break;
+            } catch (primaryError) {
+                if (primaryError.response && (primaryError.response.status === 500 || primaryError.response.status === 503)) {
+                    console.warn(url, 'API failed with 500/503, trying fallback API');
+                }
+            }
+        }
+        if (response) {
             res.setHeader('Content-Type', 'image/jpeg');
             response.data.pipe(res);
-        } catch (primaryError) {
-            if (primaryError.response && primaryError.response.status === 500) {
-                console.warn('Primary API failed with 500, trying fallback API');
-                try {
-                    const response = await generateImage(imageInput, IMAGE_API_URL_FALLBACK);
-                    res.setHeader('Content-Type', 'image/jpeg');
-                    response.data.pipe(res);
-                } catch (fallbackError) {
-                    console.error('Fallback API also failed:', fallbackError);
-                    res.status(500).send('Both primary and fallback APIs failed: ' + fallbackError.message);
-                }
-            } else {
-                throw primaryError;
-            }
+        } else {
+            res.status(500).send('All APIs failed: ');
         }
     } catch (error) {
         console.error('Error generating image:', error);
