@@ -6,8 +6,8 @@ import { v4 as uuidv4 } from 'uuid';
 import cors from 'cors';
 import db from './db.js';
 
-import dotenv from 'dotenv';
-dotenv.config();
+// import dotenv from 'dotenv';
+// dotenv.config();
 
 
 const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
