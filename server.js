@@ -11,7 +11,7 @@ import db from './db.js';
 
 
 const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
-const OPENAI_API_KEY = "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"
+const OPENAI_API_KEY = "sk-svcacct-d7o52nWVEx5QwpHaLLjbtykGvrcL93cMtRuKPxZZKMxvzB-Jsgc5n8T3BlbkFJuT6bM_tDECmRe04YrufJKeW59pNe5OMEhK5NMMQ_o5jBdIKocWwSQA"
 const IMAGE_API_URLS = ['https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3-medium',
     'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2',
      'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0'];
