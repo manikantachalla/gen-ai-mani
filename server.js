@@ -13,6 +13,7 @@ import db from './db.js';
 const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const IMAGE_API_URL_PRIMARY = 'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3-medium';
+const IMAGE_API_URL_FALLBACK = 'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2'
 const RESPONSE_API_URL = 'https://api.openai.com/v1/chat/completions';
 
 
