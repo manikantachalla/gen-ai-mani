@@ -174,8 +174,6 @@ const callOpenAI = async (originalPrompt) => {
     }
 };
 
-callOpenAI();
-
 
 
 
