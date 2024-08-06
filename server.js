@@ -12,7 +12,7 @@ const RESPONSE_API_URL = 'https://api.openai.com/v1/chat/completions';
 const OPENAI_API_KEY = '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';  // Replace with your OpenAI API key
 
 const app = express();
-const port = 4949;
+const port = process.env.PORT || 4949;
 
 app.use(cors());
 app.use(bodyParser.json());
